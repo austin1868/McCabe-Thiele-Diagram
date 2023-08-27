@@ -46,7 +46,37 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, N):
 
     # caculate stage matrix
 
+    # Redefining the given values and parameters
 
+    # Initialize lists to store stage values
+    stages = []
+    xi_values = [xd]  # Start with x0 = xD
+    yi_values = [xd]  # Start with y0 = xD
+
+    # Iteratively calculate stage values
+    for i in range(999):  
+        # Calculate xi
+        xi = xi_values[-1] - eta * (xi_values[-1] - yi_values[-1] / (alpha - yi_values[-1] * (alpha - 1)))
+        # Calculate yi based on the condition
+        if xi > xf:
+            yi = (xd + xi * RR) / (1 + RR)
+        else:
+            yi = ((yf - xb) / (xf - xb)) * (xi - xb) + xb
+        
+        # Append to lists
+        xi_values.append(xi)
+        yi_values.append(yi)
+        stages.append(i+1)
+        
+        # Break if yi is less than xb
+        if yi < xb:
+            break
+
+    stages, xi_values, yi_values
+
+    print(xi_values)
+    print(yi_values)
+    print(stages)
 
 
     # Generate the equilibrium curve
