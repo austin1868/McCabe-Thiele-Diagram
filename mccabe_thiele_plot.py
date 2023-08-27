@@ -44,10 +44,7 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, N):
 
     # find Nf (feed stage)--not filled in for now (need stage matrix)
 
-    # caculate stage matrix
-
-    # Redefining the given values and parameters
-
+    # caculate stage matrix 
     # Initialize lists to store stage values
     stages = []
     xi_values = [xd]  # Start with x0 = xD
@@ -98,7 +95,8 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, N):
 
     # 45 Line
     y_45 = x
-    
+
+ 
     # Plotting
     plt.figure(figsize=(10, 8))
     plt.plot(x, y, label="Equilibrium Curve", color="blue")
@@ -107,6 +105,19 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, N):
     plt.plot(x, y_feed, label="Feed Line", color="purple", linestyle="--")
     plt.plot(x, y_45, label="", color="black")
     
+    # Plot the stages and the lines connecting them to the equilibrium curve
+    for i in range(1, len(stages)+1):
+        # Plot the stage point
+        plt.scatter(xi_values[i], yi_values[i], color='black')
+        # Vertical line up to equilibrium curve
+        y_intersect = alpha * xi_values[i] / (1 + (alpha - 1) * xi_values[i])
+        plt.plot([xi_values[i], xi_values[i]], [yi_values[i], y_intersect], color='grey')
+        # Horizontal line to the next stage
+        plt.plot([xi_values[i], xi_values[i-1]], [y_intersect, y_intersect], color='grey')
+    
+    # Plot the last stage point
+    plt.scatter(xi_values[-1], yi_values[-1], color='black')
+
     # Labels, title, and other aesthetics
     plt.xlabel("x (Liquid phase mole fraction)")
     plt.ylabel("y (Vapor phase mole fraction)")
