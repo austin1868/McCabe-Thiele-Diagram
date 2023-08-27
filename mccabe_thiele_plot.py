@@ -39,10 +39,6 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
     # find Yf
     yf = (xd+xf*RR)/(1+RR)
 
-    # find N (number of stages)--not filled in for now (need stage matrix)
-
-    # find Nf (feed stage)--not filled in for now (need stage matrix)
-
     # caculate stage matrix 
     # Initialize lists to store stage values
     stages = []
@@ -74,6 +70,44 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
     print(yi_values)
     print(stages)
 
+    # find N (number of stages)--not filled in for now (need stage matrix)
+    # Given the stages list, we'll calculate the number of stages based on the conditions
+    def calculate_stages(stages, RR, RRmin, xb):
+        # Check if RR is greater than RRmin
+        if RR > RRmin:
+            max_stage = max(stages)
+            # Get the value from the xi_values list corresponding to the max stage
+            xi_max_stage_minus_1 = xi_values[max_stage - 1]
+            xi_max_stage = xi_values[max_stage]
+            # Calculate the number of stages using the provided formula
+            num_stages = max_stage - 1 + (xi_max_stage_minus_1 - xb) / (xi_max_stage_minus_1 - xi_max_stage)
+            return num_stages
+        else:
+            return "INF"
+
+    # Calculate the number of stages
+    num_stages = calculate_stages(stages, RR, RRmin, xb)
+    num_stages
+
+    print("N:", num_stages)
+
+    # find Nf (feed stage)--not filled in for now (need stage matrix)
+    def calculate_feed_stage(stages, xi_values, RR, RRmin, xf):
+        # Check if RR is greater than RRmin
+        if RR > RRmin:
+            # Find the index of the value in xi_values closest to but not greater than xf
+            index = next(i for i, x in enumerate(xi_values) if x > xf)
+            # Get the stage from the stages list corresponding to the index and add 1
+            feed_stage = stages[index] - 1
+            return feed_stage
+        else:
+            return "INF"
+
+    # Calculate the feed stage
+    feed_stage = calculate_feed_stage(stages, xi_values, RR, RRmin, xf)
+    feed_stage
+
+    print("Nf:", feed_stage)
 
     # Generate the equilibrium curve
     x = np.linspace(0, 1, 1000)
