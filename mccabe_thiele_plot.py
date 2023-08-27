@@ -1,12 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-alpha = 4
-zf = 0.7
-q = 0.4
-xd = 0.95
-xb = 0.1
-RR = 1.3
-eta = 1
 
 def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
     #inputs
