@@ -126,8 +126,20 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
     # 45 Line
     y_45 = x
 
- 
-      # Filter x and y values for the Rectifying Operating Line based on the updated conditions
+    outputs = {
+        "xi_values": xi_values,
+        "yi_values": yi_values,
+        "stages": stages,
+        "xp": xp,
+        "yp": yp,
+        "RRmin": RRmin,
+        "xf": xf,
+        "yf": yf,
+        "N": num_stages,
+        "Nf": feed_stage
+    }
+
+    # Filter x and y values for the Rectifying Operating Line based on the updated conditions
     x_rect_filtered = [x_val for x_val, y_val_rect, y_val_strip, y_45_val in zip(x, y_rectifying, y_stripping, y_45) if y_val_rect > y_45_val and y_val_rect < y_val_strip]
     y_rect_filtered = [y_val_rect for y_val_rect, y_val_strip, y_45_val in zip(y_rectifying, y_stripping, y_45) if y_val_rect > y_45_val and y_val_rect < y_val_strip]
 
@@ -180,18 +192,54 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
     plt.ylim(0, 1)
     plt.show()
 
-    print(xi_values)
-    print(yi_values)
-    print(stages)
 
-    print("xp:",xp)
-    print("yp:",yp)
-    print("RRmin:",RRmin)
-    print("xf:",xf)
-    print("yf:",yf)
-    print("N:", num_stages)
-    print("Nf:", feed_stage)
+    
+    # Return the outputs dictionary
+    return outputs
 
-# To use the function, provide the required parameters and call the function:
 
-mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta)
+import tkinter as tk
+from tkinter import ttk
+
+# Your mccabe_thiele_plot function goes here...
+
+
+def calculate():
+    # Retrieve values from input fields
+    alpha = float(alpha_entry.get())
+    zf = float(zf_entry.get())
+    q = float(q_entry.get())
+    xd = float(xd_entry.get())
+    xb = float(xb_entry.get())
+    RR = float(RR_entry.get())
+    eta = float(eta_entry.get())
+
+    # Call the mccabe_thiele_plot function
+    outputs = mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta)
+
+    # Display the outputs in the text box
+    output_text.delete(1.0, tk.END)  # Clear previous outputs
+    for label, value in outputs.items():
+        output_text.insert(tk.END, f"{label}: {value}\n")
+
+
+# Set up the main window
+root = tk.Tk()
+root.title("McCabe-Thiele Plot")
+
+# Input labels and entry boxes
+labels = ["alpha", "zf", "q", "xd", "xb", "RR", "eta"]
+entries = [alpha_entry, zf_entry, q_entry, xd_entry, xb_entry, RR_entry, eta_entry] = [ttk.Entry(root) for _ in labels]
+
+for i, label in enumerate(labels):
+    ttk.Label(root, text=label).grid(row=i, column=0)
+    entries[i].grid(row=i, column=1)
+
+# Calculate button
+ttk.Button(root, text="Calculate", command=calculate).grid(row=len(labels), column=0, columnspan=2)
+
+# Output text box
+output_text = tk.Text(root, wrap=tk.WORD, height=15, width=50)
+output_text.grid(row=len(labels)+1, column=0, columnspan=2, pady=10)
+
+root.mainloop()
