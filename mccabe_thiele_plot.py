@@ -6,10 +6,9 @@ q = 0.4
 xd = 0.95
 xb = 0.1
 RR = 1.3
-N = 5
 eta = 1
 
-def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, N):
+def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
     #inputs
 
     # find xp
@@ -130,4 +129,4 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, N):
 
 # To use the function, provide the required parameters and call the function:
 
-mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, N)
+mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta)
