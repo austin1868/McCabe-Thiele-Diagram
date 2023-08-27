@@ -66,9 +66,7 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
 
     stages, xi_values, yi_values
 
-    print(xi_values)
-    print(yi_values)
-    print(stages)
+
 
     # find N (number of stages)--not filled in for now (need stage matrix)
     # Given the stages list, we'll calculate the number of stages based on the conditions
@@ -89,8 +87,6 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
     num_stages = calculate_stages(stages, RR, RRmin, xb)
     num_stages
 
-    print("N:", num_stages)
-
     # find Nf (feed stage)--not filled in for now (need stage matrix)
     def calculate_feed_stage(stages, xi_values, RR, RRmin, xf):
         # Check if RR is greater than RRmin
@@ -106,8 +102,6 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
     # Calculate the feed stage
     feed_stage = calculate_feed_stage(stages, xi_values, RR, RRmin, xf)
     feed_stage
-
-    print("Nf:", feed_stage)
 
     # Define the range of mole fractions
     x = np.linspace(0, 1, 1000)
@@ -185,6 +179,18 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
     plt.xlim(0, 1)
     plt.ylim(0, 1)
     plt.show()
+
+    print(xi_values)
+    print(yi_values)
+    print(stages)
+
+    print("xp:",xp)
+    print("yp:",yp)
+    print("RRmin:",RRmin)
+    print("xf:",xf)
+    print("yf:",yf)
+    print("N:", num_stages)
+    print("Nf:", feed_stage)
 
 # To use the function, provide the required parameters and call the function:
 
