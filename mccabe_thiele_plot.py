@@ -109,6 +109,9 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
 
     print("Nf:", feed_stage)
 
+    # Define the range of mole fractions
+    x = np.linspace(0, 1, 1000)
+
     # Generate the equilibrium curve
     x = np.linspace(0, 1, 1000)
     y = alpha * x / (1 + (alpha - 1) * x)
@@ -130,14 +133,36 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
     y_45 = x
 
  
+      # Filter x and y values for the Rectifying Operating Line based on the updated conditions
+    x_rect_filtered = [x_val for x_val, y_val_rect, y_val_strip, y_45_val in zip(x, y_rectifying, y_stripping, y_45) if y_val_rect > y_45_val and y_val_rect < y_val_strip]
+    y_rect_filtered = [y_val_rect for y_val_rect, y_val_strip, y_45_val in zip(y_rectifying, y_stripping, y_45) if y_val_rect > y_45_val and y_val_rect < y_val_strip]
+
+    # Filter x and y values for the Stripping Operating Line based on the updated conditions
+    x_strip_filtered = [x_val for x_val, y_val_rect, y_val_strip, y_45_val in zip(x, y_rectifying, y_stripping, y_45) if y_val_strip > y_45_val and y_val_strip < y_val_rect]
+    y_strip_filtered = [y_val_strip for y_val_rect, y_val_strip, y_45_val in zip(y_rectifying, y_stripping, y_45) if y_val_strip > y_45_val and y_val_strip < y_val_rect]
+
+    # Filter x and y values for the Feed Line to ensure it is plotted only below the equilibrium curve and above 45
+    x_feed_filtered = [x_val for x_val, y_val_feed, y_val_eq, y_45_val in zip(x, y_feed, y, y_45) if y_val_feed > y_45_val and y_val_feed < y_val_eq]
+    y_feed_filtered = [y_val_feed for y_val_feed, y_val_eq, y_45_val in zip(y_feed, y, y_45) if y_val_feed > y_45_val and y_val_feed < y_val_eq]
+
     # Plotting
     plt.figure(figsize=(10, 8))
+
+    # Plot Equilibrium Curve
     plt.plot(x, y, label="Equilibrium Curve", color="blue")
-    plt.plot(x, y_rectifying, label="Rectifying Operating Line", color="red")
-    plt.plot(x, y_stripping, label="Stripping Operating Line", color="green")
-    plt.plot(x, y_feed, label="Feed Line", color="purple", linestyle="--")
-    plt.plot(x, y_45, label="", color="black")
-    
+
+    # Plot the filtered Rectifying Operating Line segment
+    plt.plot(x_rect_filtered, y_rect_filtered, label="Rectifying Operating Line", color="red")
+
+    # Plot the filtered Stripping Operating Line segment
+    plt.plot(x_strip_filtered, y_strip_filtered, label="Stripping Operating Line", color="green")
+
+    # Plot Feed Line
+    plt.plot(x_feed_filtered, y_feed_filtered, label="Feed Line", color="purple", linestyle="--")
+
+    # Plot 45-degree line
+    plt.plot(x, y_45, label="45-degree line", color="black")
+
     # Plot the stages and the lines connecting them to the equilibrium curve
     for i in range(1, len(stages)+1):
         # Plot the stage point
@@ -149,7 +174,7 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
         plt.plot([xi_values[i], xi_values[i-1]], [y_intersect, y_intersect], color='grey')
     
     # Plot the last stage point
-    plt.scatter(xi_values[-1], yi_values[-1], color='black')
+    plt.scatter(xi_values[0], yi_values[0], color='black')
 
     # Labels, title, and other aesthetics
     plt.xlabel("x (Liquid phase mole fraction)")
