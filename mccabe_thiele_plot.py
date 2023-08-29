@@ -85,12 +85,17 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
         # Check if RR is greater than RRmin
         if RR > RRmin:
             # Find the index of the value in xi_values closest to but not greater than xf
-            index = next(i for i, x in enumerate(xi_values) if x > xf)
+            index = next((i for i, x in enumerate(xi_values) if x > xf), None)
+            
+            if index is None:
+                return "No feed stage found"
+            
             # Get the stage from the stages list corresponding to the index and add 1
             feed_stage = stages[index] - 1
             return feed_stage
         else:
             return "INF"
+
 
     # Calculate the feed stage
     feed_stage = calculate_feed_stage(stages, xi_values, RR, RRmin, xf)
@@ -194,9 +199,6 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
 import tkinter as tk
 from tkinter import ttk
 
-# Your mccabe_thiele_plot function goes here...
-
-
 def calculate():
     # Retrieve values from input fields
     alpha = float(alpha_entry.get())
@@ -210,11 +212,19 @@ def calculate():
     # Call the mccabe_thiele_plot function
     outputs = mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta)
 
-    # Display the outputs in the text box
+    # Clear the table (Treeview)
+    for row in table.get_children():
+        table.delete(row)
+
+    # Populate the Treeview with data
+    for stage, xi, yi in zip(outputs["stages"], outputs["xi_values"], outputs["yi_values"]):
+        table.insert("", "end", values=(stage, xi, yi))
+
+    # Display the other outputs in the text box
     output_text.delete(1.0, tk.END)  # Clear previous outputs
     for label, value in outputs.items():
-        output_text.insert(tk.END, f"{label}: {value}\n")
-
+        if label not in ["xi_values", "yi_values", "stages"]:
+            output_text.insert(tk.END, f"{label}: {value}\n")
 
 # Set up the main window
 root = tk.Tk()
@@ -225,14 +235,21 @@ labels = ["alpha", "zf", "q", "xd", "xb", "RR", "eta"]
 entries = [alpha_entry, zf_entry, q_entry, xd_entry, xb_entry, RR_entry, eta_entry] = [ttk.Entry(root) for _ in labels]
 
 for i, label in enumerate(labels):
-    ttk.Label(root, text=label).grid(row=i, column=0)
-    entries[i].grid(row=i, column=1)
+    ttk.Label(root, text=label).grid(row=i, column=0, padx=10, pady=5)
+    entries[i].grid(row=i, column=1, padx=10, pady=5)
 
 # Calculate button
-ttk.Button(root, text="Calculate", command=calculate).grid(row=len(labels), column=0, columnspan=2)
+ttk.Button(root, text="Calculate", command=calculate).grid(row=len(labels), column=0, columnspan=2, pady=10)
 
 # Output text box
-output_text = tk.Text(root, wrap=tk.WORD, height=15, width=50)
+output_text = tk.Text(root, wrap=tk.WORD, height=10, width=50)
 output_text.grid(row=len(labels)+1, column=0, columnspan=2, pady=10)
+
+# Treeview for table display
+table = ttk.Treeview(root, columns=("Stages", "xi_values", "yi_values"), show="headings")
+table.heading("Stages", text="Stages")
+table.heading("xi_values", text="xi_values")
+table.heading("yi_values", text="yi_values")
+table.grid(row=len(labels)+2, column=0, columnspan=2, pady=10)
 
 root.mainloop()
