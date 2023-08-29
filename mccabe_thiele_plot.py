@@ -258,11 +258,12 @@ style.map('Treeview',
           foreground=[('selected', 'white')])
 
 # Input labels and entry boxes
+label_font = ("Arial", 12, "bold")
 labels = ["alpha", "zf", "q", "xd", "xb", "RR", "eta"]
 entries = [alpha_entry, zf_entry, q_entry, xd_entry, xb_entry, RR_entry, eta_entry] = [ttk.Entry(root) for _ in labels]
 
 for i, label in enumerate(labels):
-    ttk.Label(root, text=label).grid(row=i, column=0, padx=10, pady=5)
+    ttk.Label(root, text=label, font=label_font, background=bg_color, foreground=text_color).grid(row=i, column=0, padx=10, pady=5)
     entries[i].grid(row=i, column=1, padx=10, pady=5)
 
 # Calculate button
