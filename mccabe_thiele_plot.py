@@ -226,6 +226,7 @@ def calculate():
         if label not in ["xi_values", "yi_values", "stages"]:
             output_text.insert(tk.END, f"{label}: {value}\n")
 
+
 # Set up the main window
 root = tk.Tk()
 root.title("McCabe-Thiele Plot")
@@ -237,42 +238,46 @@ entry_fg_color = '#FFFFFF'
 text_color = '#FFFFFF'
 button_color = '#555555'
 button_text_color = '#FFFFFF'
+input_text_color = '#2E2E2E'
 
 # Set main window background
 root.configure(bg=bg_color)
 
+# Configure ttk styles
+style = ttk.Style()
+style.configure("TButton", background=button_color, foreground=input_text_color)
+style.configure("TLabel", background=bg_color, foreground=text_color)
+style.configure("TEntry", foreground=input_text_color, fieldbackground=entry_bg_color)
+style.configure("Treeview",
+    background=entry_bg_color,
+    foreground=entry_fg_color,
+    fieldbackground=entry_bg_color
+)
+style.map('Treeview', 
+          background=[('selected', '#444444')],
+          foreground=[('selected', 'white')])
+
 # Input labels and entry boxes
 labels = ["alpha", "zf", "q", "xd", "xb", "RR", "eta"]
-entries = [alpha_entry, zf_entry, q_entry, xd_entry, xb_entry, RR_entry, eta_entry] = [ttk.Entry(root, foreground=entry_fg_color, background=entry_bg_color) for _ in labels]
+entries = [alpha_entry, zf_entry, q_entry, xd_entry, xb_entry, RR_entry, eta_entry] = [ttk.Entry(root) for _ in labels]
 
 for i, label in enumerate(labels):
-    ttk.Label(root, text=label, background=bg_color, foreground=text_color).grid(row=i, column=0, padx=10, pady=5)
+    ttk.Label(root, text=label).grid(row=i, column=0, padx=10, pady=5)
     entries[i].grid(row=i, column=1, padx=10, pady=5)
 
 # Calculate button
-calculate_btn = ttk.Button(root, text="Calculate", command=calculate)
-calculate_btn.grid(row=len(labels), column=0, columnspan=2, pady=10)
-calculate_btn.configure(background=button_color, foreground=button_text_color)
+ttk.Button(root, text="Calculate", command=calculate).grid(row=len(labels), column=0, columnspan=2, pady=10)
 
 # Output text box
 output_text = tk.Text(root, wrap=tk.WORD, height=10, width=50, bg=entry_bg_color, fg=entry_fg_color)
 output_text.grid(row=len(labels)+1, column=0, columnspan=2, pady=10)
 
 # Treeview for table display
-table = ttk.Treeview(root, columns=("Stages", "xi_values", "yi_values"), show="headings", selectbackground='#444444', selectforeground='white')
+table = ttk.Treeview(root, columns=("Stages", "xi_values", "yi_values"), show="headings")
 table.heading("Stages", text="Stages")
 table.heading("xi_values", text="xi_values")
 table.heading("yi_values", text="yi_values")
 table.grid(row=len(labels)+2, column=0, columnspan=2, pady=10)
 
-# Style the Treeview for dark mode
-style = ttk.Style()
-style.theme_use('default')
-style.configure("Treeview",
-    background=entry_bg_color,
-    foreground=entry_fg_color,
-    fieldbackground=entry_bg_color
-)
-style.map('Treeview', background=[('selected', '#444444')])
-
 root.mainloop()
+
