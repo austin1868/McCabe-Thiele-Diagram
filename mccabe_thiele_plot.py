@@ -150,18 +150,61 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
         "Nf": feed_stage
     }
 
-
 def calculate():
-    alpha = float(alpha_entry.get())
-    zf = float(zf_entry.get())
-    q = float(q_entry.get())
-    xd = float(xd_entry.get())
-    xb = float(xb_entry.get())
-    RR = float(RR_entry.get())
-    eta = float(eta_entry.get())
+    output_text.delete(1.0, tk.END)
+    
+    try:
+        alpha_val = alpha_entry.get()
+        if not alpha_val:
+            output_text.insert(tk.END, "Alpha input is empty.\n")
+            return
+        alpha = float(alpha_val)
+    except ValueError:
+        output_text.insert(tk.END, f"Problem with alpha input: {alpha_val}\n")
+        return
 
-    outputs = mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta)
+    try:
+        zf = float(zf_entry.get())
+    except ValueError:
+        output_text.insert(tk.END, f"Problem with zf input: {zf_entry.get()}\n")
+        return
 
+    try:
+        q = float(q_entry.get())
+    except ValueError:
+        output_text.insert(tk.END, f"Problem with q input: {q_entry.get()}\n")
+        return
+
+    try:
+        xd = float(xd_entry.get())
+    except ValueError:
+        output_text.insert(tk.END, f"Problem with xd input: {xd_entry.get()}\n")
+        return
+
+    try:
+        xb = float(xb_entry.get())
+    except ValueError:
+        output_text.insert(tk.END, f"Problem with xb input: {xb_entry.get()}\n")
+        return
+
+    try:
+        RR = float(RR_entry.get())
+    except ValueError:
+        output_text.insert(tk.END, f"Problem with RR input: {RR_entry.get()}\n")
+        return
+
+    try:
+        eta = float(eta_entry.get())
+    except ValueError:
+        output_text.insert(tk.END, f"Problem with eta input: {eta_entry.get()}\n")
+        return
+    
+    try:
+        outputs = mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta)
+    except Exception as e:
+        output_text.insert(tk.END, f"Error in mccabe_thiele_plot: {str(e)}\n")
+        return
+    
     # Clear the table
     for row in table.get_children():
         table.delete(row)
@@ -176,6 +219,18 @@ def calculate():
         if label not in ["xi_values", "yi_values", "stages"]:
             output_text.insert(tk.END, f"{label}: {value}\n")
 
+def on_slider_change(value, entry):
+    """Update the entry when the slider changes."""
+    entry.delete(0, tk.END)
+    entry.insert(0, str(round(float(value), 2)))
+
+
+def on_entry_change(entry_var, slider):
+    """Update the slider when the entry changes."""
+    try:
+        slider.set(float(entry_var.get()))
+    except ValueError:
+        pass  # Do nothing if entry cannot be converted to float
 
 # GUI Setup
 root = tk.Tk()
@@ -206,17 +261,37 @@ label_font = ("Arial", 12, "bold")
 labels = ["alpha", "zf", "q", "xd", "xb", "RR", "eta"]
 entries = [alpha_entry, zf_entry, q_entry, xd_entry, xb_entry, RR_entry, eta_entry] = [ttk.Entry(root) for _ in labels]
 
-for i, label in enumerate(labels):
-    ttk.Label(root, text=label, font=label_font).grid(row=i, column=0, padx=10, pady=5)
-    entries[i].grid(row=i, column=1, padx=10, pady=5)
 
-ttk.Button(root, text="Calculate", command=calculate).grid(row=len(labels), column=0, columnspan=2, pady=10)
+# Input labels, entry boxes, and sliders
+labels = ["alpha", "zf", "q", "xd", "xb", "RR", "eta"]
+ranges = [(1, 10), (0, 1), (0, 1), (0, 1), (0, 1), (0, 10), (0, 1)]  # Example ranges for each slider; adjust as needed
+
+entries = []
+sliders = []
+
+for i, (label, (min_val, max_val)) in enumerate(zip(labels, ranges)):
+    ttk.Label(root, text=label, font=label_font).grid(row=i, column=0, padx=10, pady=5)
+    
+    entry_var = tk.StringVar()
+    entry = ttk.Entry(root, textvariable=entry_var)
+    entry.grid(row=i, column=1, padx=10, pady=5)
+    entries.append(entry)
+    
+    slider = ttk.Scale(root, from_=min_val, to=max_val, orient=tk.HORIZONTAL)
+    slider['command'] = lambda value, entry=entry: on_slider_change(value, entry)  # Fixing late binding issue
+    slider.grid(row=i, column=2, padx=10, pady=5)
+    sliders.append(slider)
+
+    # Link slider and entry
+    entry_var.trace_add("write", lambda *args, slider=slider, entry_var=entry_var: on_entry_change(entry_var, slider))
+
+ttk.Button(root, text="Calculate", command=calculate).grid(row=len(labels), column=0, columnspan=3, pady=10)  # Change columnspan to 3 to span over the added slider
 output_text = tk.Text(root, wrap=tk.WORD, height=10, width=50, bg=COLORS["entry_bg"], fg=COLORS["entry_fg"])
-output_text.grid(row=len(labels)+1, column=0, columnspan=2, pady=10)
+output_text.grid(row=len(labels)+1, column=0, columnspan=3, pady=10)  # Change columnspan to 3 to span over the added slider
 table = ttk.Treeview(root, columns=("Stages", "xi_values", "yi_values"), show="headings")
 table.heading("Stages", text="Stages")
 table.heading("xi_values", text="xi_values")
 table.heading("yi_values", text="yi_values")
-table.grid(row=len(labels)+2, column=0, columnspan=2, pady=10)
+table.grid(row=len(labels)+2, column=0, columnspan=3, pady=10)  # Change columnspan to 3 to span over the added slider
 
 root.mainloop()
