@@ -152,7 +152,7 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
 
 def calculate():
     output_text.delete(1.0, tk.END)
-    
+    print(f"Alpha entry value before error check: '{alpha_entry.get()}'")
     try:
         alpha_val = alpha_entry.get()
         if not alpha_val:
@@ -221,16 +221,22 @@ def calculate():
 
 def on_slider_change(value, entry):
     """Update the entry when the slider changes."""
+    global updating_entry
+    print(f"Slider changed to: {value}")  # Debugging line
+    updating_entry = True
     entry.delete(0, tk.END)
     entry.insert(0, str(round(float(value), 2)))
-
+    root.update_idletasks()
+    updating_entry = False
 
 def on_entry_change(entry_var, slider):
     """Update the slider when the entry changes."""
-    try:
-        slider.set(float(entry_var.get()))
-    except ValueError:
-        pass  # Do nothing if entry cannot be converted to float
+    print(f"Entry changed to: {entry_var.get()}")  # Debugging line
+    if not updating_entry:
+        try:
+            slider.set(float(entry_var.get()))
+        except ValueError:
+            pass
 
 # GUI Setup
 root = tk.Tk()
@@ -277,21 +283,26 @@ for i, (label, (min_val, max_val)) in enumerate(zip(labels, ranges)):
     entry.grid(row=i, column=1, padx=10, pady=5)
     entries.append(entry)
     
-    slider = ttk.Scale(root, from_=min_val, to=max_val, orient=tk.HORIZONTAL)
-    slider['command'] = lambda value, entry=entry: on_slider_change(value, entry)  # Fixing late binding issue
+    slider = ttk.Scale(root, from_=min_val, to=max_val, orient=tk.HORIZONTAL, command=lambda value, entry=entry: on_slider_change(value, entry))
     slider.grid(row=i, column=2, padx=10, pady=5)
     sliders.append(slider)
 
     # Link slider and entry
     entry_var.trace_add("write", lambda *args, slider=slider, entry_var=entry_var: on_entry_change(entry_var, slider))
 
-ttk.Button(root, text="Calculate", command=calculate).grid(row=len(labels), column=0, columnspan=3, pady=10)  # Change columnspan to 3 to span over the added slider
+# Set default values for sliders and entries (this ensures they aren't empty on start)
+defaults = [5, 0.5, 0.5, 0.5, 0.5, 5, 0.5]
+for entry, slider, default in zip(entries, sliders, defaults):
+    entry.insert(0, str(default))
+    slider.set(default)
+
+ttk.Button(root, text="Calculate", command=calculate).grid(row=len(labels), column=0, columnspan=3, pady=10)
 output_text = tk.Text(root, wrap=tk.WORD, height=10, width=50, bg=COLORS["entry_bg"], fg=COLORS["entry_fg"])
-output_text.grid(row=len(labels)+1, column=0, columnspan=3, pady=10)  # Change columnspan to 3 to span over the added slider
+output_text.grid(row=len(labels)+1, column=0, columnspan=3, pady=10)
 table = ttk.Treeview(root, columns=("Stages", "xi_values", "yi_values"), show="headings")
 table.heading("Stages", text="Stages")
 table.heading("xi_values", text="xi_values")
 table.heading("yi_values", text="yi_values")
-table.grid(row=len(labels)+2, column=0, columnspan=3, pady=10)  # Change columnspan to 3 to span over the added slider
+table.grid(row=len(labels)+2, column=0, columnspan=3, pady=10)
 
 root.mainloop()
