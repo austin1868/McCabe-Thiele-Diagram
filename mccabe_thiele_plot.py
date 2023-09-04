@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import tkinter as tk
-from tkinter import ttk
+import customtkinter as ctk
+from customtkinter import cttk
 
 
 def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
@@ -151,58 +151,58 @@ def mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta):
     }
 
 def calculate():
-    output_text.delete(1.0, tk.END)
+    output_text.delete(1.0, ctk.END)
     print(f"Alpha entry value before error check: '{alpha_entry.get()}'")
     try:
         alpha_val = alpha_entry.get()
         if not alpha_val:
-            output_text.insert(tk.END, "Alpha input is empty.\n")
+            output_text.insert(ctk.END, "Alpha input is empty.\n")
             return
         alpha = float(alpha_val)
     except ValueError:
-        output_text.insert(tk.END, f"Problem with alpha input: {alpha_val}\n")
+        output_text.insert(ctk.END, f"Problem with alpha input: {alpha_val}\n")
         return
 
     try:
         zf = float(zf_entry.get())
     except ValueError:
-        output_text.insert(tk.END, f"Problem with zf input: {zf_entry.get()}\n")
+        output_text.insert(ctk.END, f"Problem with zf input: {zf_entry.get()}\n")
         return
 
     try:
         q = float(q_entry.get())
     except ValueError:
-        output_text.insert(tk.END, f"Problem with q input: {q_entry.get()}\n")
+        output_text.insert(ctk.END, f"Problem with q input: {q_entry.get()}\n")
         return
 
     try:
         xd = float(xd_entry.get())
     except ValueError:
-        output_text.insert(tk.END, f"Problem with xd input: {xd_entry.get()}\n")
+        output_text.insert(ctk.END, f"Problem with xd input: {xd_entry.get()}\n")
         return
 
     try:
         xb = float(xb_entry.get())
     except ValueError:
-        output_text.insert(tk.END, f"Problem with xb input: {xb_entry.get()}\n")
+        output_text.insert(ctk.END, f"Problem with xb input: {xb_entry.get()}\n")
         return
 
     try:
         RR = float(RR_entry.get())
     except ValueError:
-        output_text.insert(tk.END, f"Problem with RR input: {RR_entry.get()}\n")
+        output_text.insert(ctk.END, f"Problem with RR input: {RR_entry.get()}\n")
         return
 
     try:
         eta = float(eta_entry.get())
     except ValueError:
-        output_text.insert(tk.END, f"Problem with eta input: {eta_entry.get()}\n")
+        output_text.insert(ctk.END, f"Problem with eta input: {eta_entry.get()}\n")
         return
     
     try:
         outputs = mccabe_thiele_plot(alpha, zf, q, xd, xb, RR, eta)
     except Exception as e:
-        output_text.insert(tk.END, f"Error in mccabe_thiele_plot: {str(e)}\n")
+        output_text.insert(ctk.END, f"Error in mccabe_thiele_plot: {str(e)}\n")
         return
     
     # Clear the table
@@ -214,17 +214,17 @@ def calculate():
         table.insert("", "end", values=(stage, xi, yi))
 
     # Display other outputs
-    output_text.delete(1.0, tk.END)
+    output_text.delete(1.0, ctk.END)
     for label, value in outputs.items():
         if label not in ["xi_values", "yi_values", "stages"]:
-            output_text.insert(tk.END, f"{label}: {value}\n")
+            output_text.insert(ctk.END, f"{label}: {value}\n")
 
 def on_slider_change(value, entry):
     """Update the entry when the slider changes."""
     global updating_entry
     print(f"Slider changed to: {value}")  # Debugging line
     updating_entry = True
-    entry.delete(0, tk.END)
+    entry.delete(0, ctk.END)
     entry.insert(0, str(round(float(value), 2)))
     root.update_idletasks()
     updating_entry = False
@@ -239,7 +239,7 @@ def on_entry_change(entry_var, slider):
             pass
 
 # GUI Setup
-root = tk.Tk()
+root = ctk.Tk()
 root.title("McCabe-Thiele Plot")
 
 # Dark Mode Colors
@@ -255,7 +255,7 @@ COLORS = {
 
 # Configure window and styles
 root.configure(bg=COLORS["bg"])
-style = ttk.Style()
+style = cttk.Style()
 style.configure("TButton", background=COLORS["button"], foreground=COLORS["input_text"])
 style.configure("TLabel", background=COLORS["bg"], foreground=COLORS["text"])
 style.configure("TEntry", foreground=COLORS["input_text"], fieldbackground=COLORS["entry_bg"])
@@ -265,7 +265,7 @@ style.map('Treeview', background=[('selected', '#444444')], foreground=[('select
 # Input labels and entry boxes
 label_font = ("Arial", 12, "bold")
 labels = ["alpha", "zf", "q", "xd", "xb", "RR", "eta"]
-entries = [alpha_entry, zf_entry, q_entry, xd_entry, xb_entry, RR_entry, eta_entry] = [ttk.Entry(root) for _ in labels]
+entries = [alpha_entry, zf_entry, q_entry, xd_entry, xb_entry, RR_entry, eta_entry] = [cttk.Entry(root) for _ in labels]
 
 
 # Input labels, entry boxes, and sliders
@@ -276,14 +276,14 @@ entries = []
 sliders = []
 
 for i, (label, (min_val, max_val)) in enumerate(zip(labels, ranges)):
-    ttk.Label(root, text=label, font=label_font).grid(row=i, column=0, padx=10, pady=5)
+    cttk.Label(root, text=label, font=label_font).grid(row=i, column=0, padx=10, pady=5)
     
-    entry_var = tk.StringVar()
-    entry = ttk.Entry(root, textvariable=entry_var)
+    entry_var = ctk.StringVar()
+    entry = cttk.Entry(root, textvariable=entry_var)
     entry.grid(row=i, column=1, padx=10, pady=5)
     entries.append(entry)
     
-    slider = ttk.Scale(root, from_=min_val, to=max_val, orient=tk.HORIZONTAL, command=lambda value, entry=entry: on_slider_change(value, entry))
+    slider = cttk.Scale(root, from_=min_val, to=max_val, orient=ctk.HORIZONTAL, command=lambda value, entry=entry: on_slider_change(value, entry))
     slider.grid(row=i, column=2, padx=10, pady=5)
     sliders.append(slider)
 
@@ -296,10 +296,10 @@ for entry, slider, default in zip(entries, sliders, defaults):
     entry.insert(0, str(default))
     slider.set(default)
 
-ttk.Button(root, text="Calculate", command=calculate).grid(row=len(labels), column=0, columnspan=3, pady=10)
-output_text = tk.Text(root, wrap=tk.WORD, height=10, width=50, bg=COLORS["entry_bg"], fg=COLORS["entry_fg"])
+cttk.Button(root, text="Calculate", command=calculate).grid(row=len(labels), column=0, columnspan=3, pady=10)
+output_text = ctk.Text(root, wrap=ctk.WORD, height=10, width=50, bg=COLORS["entry_bg"], fg=COLORS["entry_fg"])
 output_text.grid(row=len(labels)+1, column=0, columnspan=3, pady=10)
-table = ttk.Treeview(root, columns=("Stages", "xi_values", "yi_values"), show="headings")
+table = cttk.Treeview(root, columns=("Stages", "xi_values", "yi_values"), show="headings")
 table.heading("Stages", text="Stages")
 table.heading("xi_values", text="xi_values")
 table.heading("yi_values", text="yi_values")
